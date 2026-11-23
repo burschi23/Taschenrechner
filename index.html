@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Taschenrechner</title>
+<style>
+body {
+  background: #181818;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 20px;
+}
+main {
+  max-width: 380px;
+  margin: auto;
+}
+#display {
+  background: #333;
+  color: #fff;
+  font-size: 42px;
+  padding: 22px;
+  text-align: right;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  overflow-wrap: anywhere;
+}
+.keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+button {
+  font-size: 30px;
+  height: 72px;
+  border: none;
+  border-radius: 15px;
+  background: #444;
+  color: white;
+}
+.op { background: #d97800; }
+</style>
+</head>
+<body>
+<main>
+<h2>Taschenrechner</h2>
+<div id="display">0</div>
+<div class="keys" id="keys"></div>
+</main>
+<script>
+let a = null, op = null, fresh = true;
+const d = document.getElementById('display');
+function press(k) {
+  if (k === 'AC') {
+    a = null; op = null;
+    fresh = true; d.textContent = '0';
+  } else if ('+-×÷='.includes(k)) {
+    let b = Number(d.textContent);
+    if (a !== null && op && !fresh) {
+      b = op === '+' ? a+b :
+          op === '-' ? a-b :
+          op === '×' ? a*b : a/b;
+      d.textContent = Number.isFinite(b)
+        ? String(Number(b.toPrecision(12)))
+        : 'Fehler';
+    }
+    a = k === '=' ? null : b;
+    op = k === '=' ? null : k;
+    fresh = true;
+  } else if (k === '±') {
+    d.textContent = String(-Number(d.textContent));
+  } else if (k === '%') {
+    d.textContent = String(Number(d.textContent)/100);
+  } else {
+    if (fresh || d.textContent === '0') {
+      d.textContent = k === '.' ? '0.' : k;
+      fresh = false;
+    } else if (k !== '.' || !d.textContent.includes('.')) {
+      d.textContent += k;
+    }
+  }
+}
+for (const k of [
+  'AC','±','%','÷',
+  '7','8','9','×',
+  '4','5','6','-',
+  '1','2','3','+',
+  '0','00','.','='
+]) {
+  const b = document.createElement('button');
+  b.textContent = k;
+  if ('÷×-+='.includes(k)) b.className = 'op';
+  b.onclick = () => press(k);
+  document.getElementById('keys').appendChild(b);
+}
+</script>
+</body>
+</html>
